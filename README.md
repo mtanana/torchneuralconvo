@@ -12,3 +12,10 @@ To run, use th trainoptim.lua --cuda
 
 (well-  you don't have to use cuda, but this would be crazy...)
 
+I put a small sample from the opensubs dataset up.  Really, you can add any dataset in the form:  
+
+speaker1 |  response
+
+every new line is a new pair.   
+
+
