@@ -24,6 +24,38 @@ function WordSplitLMMinibatchLoader.shuffle(t)
     return t
 end
 
+function WordSplitLMMinibatchLoader.createFromJustVocab(vocabfile)
+    local self = {}
+    setmetatable(self, WordSplitLMMinibatchLoader)
+    self:loadExistingVocabFile(vocabfile)
+
+    return self
+
+end
+
+function WordSplitLMMinibatchLoader:loadExistingVocabFile(vocabfilename)
+
+    --this is word to index
+    self.vocab_mapping = torch.load(vocabfilename)
+    self.id2word = {}
+    self.word2id=self.vocab_mapping
+
+    --count vocab and make reverse mapping
+    self.vocab_size = 0
+    for word,idx in pairs(self.vocab_mapping) do
+        self.vocab_size = self.vocab_size + 1
+        self.id2word[idx] = word
+    end
+    print('Vocab Size'..self.vocab_size)
+
+
+
+    self.goToken = self.vocab_mapping['<go>']
+    self.eosToken = self.vocab_mapping['<eos>']
+    self.unknownToken = self.vocab_mapping['<unk>']
+
+
+end
 
 function WordSplitLMMinibatchLoader.create(data_dir, batch_size,seq_length, split_fractions,vocabsize)
     -- split_fractions is e.g. {0.9, 0.05, 0.05}
@@ -66,26 +98,10 @@ function WordSplitLMMinibatchLoader.create(data_dir, batch_size,seq_length, spli
     self.val =data.val
     self.test = data.test
 
-    --this is word to index
-    self.vocab_mapping = torch.load(vocab_file)
-    self.id2word = {}
-    self.word2id=self.vocab_mapping
+    self:loadExistingVocabFile(vocab_file)
+
     --shuffle rows
     WordSplitLMMinibatchLoader.shuffleTensorRows(self.train)
-
-
-
-
-    --count vocab and make reverse mapping
-    self.vocab_size = 0
-    for word,idx in pairs(self.vocab_mapping) do
-        self.vocab_size = self.vocab_size + 1
-        self.id2word[idx] = word
-    end
-    print('Vocab Size'..self.vocab_size)
-
-
-
 
 
 
@@ -99,9 +115,6 @@ function WordSplitLMMinibatchLoader.create(data_dir, batch_size,seq_length, spli
     self.split_sizes = {self.ntrain, self.nval, self.ntest}
     self.batch_ix = {0,0,0 }
 
-    self.goToken = self.vocab_mapping['<go>']
-    self.eosToken = self.vocab_mapping['<eos>']
-    self.unknownToken = self.vocab_mapping['<unk>']
 
 
     print(string.format('data load done. Number of data batches in train: %d, val: %d, test: %d', self.ntrain, self.nval, self.ntest))
