@@ -263,15 +263,6 @@ end
 
 
 
-
-
-
-
-
-
-
-
-
 local MAX_OUTPUT_SIZE = 20
 
 function Seq2Seq:eval(input)
