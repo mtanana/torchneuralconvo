@@ -19,7 +19,7 @@ cmd:option('--learningRate', 0.01, 'learning rate at t=0')
 --cmd:option('--momentum', 0.9, 'momentum')
 cmd:option('--minLR', 0.00001, 'minimum learning rate')
 cmd:option('--saturateEpoch', 20, 'epoch at which linear decayed LR will reach minLR')
-cmd:option('--maxEpoch', 50, 'maximum number of epochs to run')
+cmd:option('--maxEpoch', 10, 'maximum number of epochs to run')
 cmd:option('--batchSize', 1, 'minibatch size')
 cmd:option('--seqLength',50,'Max Sequence Length');
 cmd:option('-seq_length_in',25,'length of sequence input')
@@ -227,13 +227,13 @@ for epoch = 1, options.maxEpoch do
         end
 
 
-        if(i % 1000000==0) then
+        if(totalcount % 1000000==0) then
             print("\n(Saving model ...)")
             torch.save("data/model.t7", model)
 
         end
 
-        if(i%500000==0 and options.track==1)then
+        if(totalcount%100000==0 and options.track==1)then
 
 
             local report=""
