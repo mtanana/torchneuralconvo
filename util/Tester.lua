@@ -50,18 +50,25 @@ end
 
 --word ids and probabilites are both tables of the length of the final output
 
-function printProbabilityTable(wordIds, probabilities, num)
+function printProbabilityTable(wordIds, predictions,probabilities, num,dataset)
     print(string.rep("-", num * 22))
    -- printmytable(wordIds)
    -- printmytable(probabilities)
     --p is the final output word id
-    for p, wordId in ipairs(wordIds) do
 
+
+    for p, probs in ipairs(probabilities) do
+        --print(p)
         local line = "| "
+        wordId = wordIds[p]
         local probs = probabilities[p];
+        local preds = predictions[p];
+
         for i = 1, num do
-           local pr =  probs[1][i]
-           local w = wordId[1][i]
+
+           local pr =  torch.exp(probs[1][i])
+           --print(wordId)
+           local w = preds[1][i]
            local word = dataset.id2word[w]
           -- print(word)
          --  local t = probabilities[1][p]
@@ -85,13 +92,17 @@ function getResponse(text,dataset,model,debug)
     end
 
     local input = torch.Tensor({wordIds}):t()
-    --print(input)
+
+    --predictions is a table of tensors of word ids
+    --probabilities are the matching probs (well...log activations)
     local output,predictions, probabilities = model:eval(input)
-   -- print(output)
+    --print("Predictions")
+    --print(predictions)
+    --print(probabilities)
     local phrase = pred2sent(output,dataset)
 
     if debug then
-       printProbabilityTable(wordIds, probabilities, 4)
+       printProbabilityTable(output, predictions,probabilities, 4,dataset)
     end
     phrase = phrase or ''
     return phrase
