@@ -3,6 +3,7 @@
 This is an implementation of seq2seq for language models implemented in torch.
 
 The main features are:
+
 1.  Multilayer LSTM's
 2.  Batch Processing
 3.  Explicit Vocabulary Size
