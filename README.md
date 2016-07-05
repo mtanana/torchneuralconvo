@@ -1,4 +1,4 @@
-# torchneuralconvo
+## Torch Neural Conversation Model
 
 This is an implementation of seq2seq for language models implemented in torch.
 
@@ -17,13 +17,19 @@ This is really an extension of awesome work from the Element Research People:  (
 
 This is technically in beta form, but I have confirmed that it is working.
 
-The nice features added from the above projects are the ability to do 1) Ada-grad 2) gradient clipping 3)  multilayer LSTM's 4) load larger datasets 5) Set explicit vocab size 6)  You can run separate train/test splits
+
 
 Might add beam search soon...
+
+##Installation
+
+## Tests
 
 To run, use th trainoptim.lua --cuda  
 
 (well-  you don't have to use cuda, but this would be crazy...)
+
+##Dataset
 
 I put a small sample from the opensubs dataset up.  Really, you can add any dataset in the form:  
 
