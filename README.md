@@ -44,11 +44,11 @@ These outputs are the top five beams (using th beam.lua)
 *  I dont know...... but i dont know.
 
 **Ask: how old are you?**
-*  <number>.
-*  Im <number>.
+*  \<number\>.
+*  Im \<number\>.
 *  I dont know.
-*  <number>?
-*  <number>, <number>.
+*  \<number\>?
+*  \<number\>, \<number\>.
 
 **Ask: goodbye**
 
