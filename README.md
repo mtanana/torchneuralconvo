@@ -37,26 +37,26 @@ These outputs are the top five beams (using th beam.lua)
 
 **Ask: where are you from ?**
 
-I dont know.
-Im from ohio.
-From the north.
-I dont know...
-I dont know...... but i dont know.
+*  I dont know.
+*  Im from ohio.
+*  From the north.
+*  I dont know...
+*  I dont know...... but i dont know.
 
 **Ask: how old are you?**
-<number>.
-Im <number>.
-I dont know.
-<number>?
-<number>, <number>.
+*  <number>.
+*  Im <number>.
+*  I dont know.
+*  <number>?
+*  <number>, <number>.
 
 **Ask: goodbye**
 
-Goodbye
-Goodbye.
-What are you doing?
-Goodbye...
-What are you doing here?
+*  Goodbye
+*  Goodbye.
+*  What are you doing?
+*  Goodbye...
+*  What are you doing here?
 
 
 
