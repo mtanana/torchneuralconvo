@@ -109,5 +109,44 @@ function getResponse(text,dataset,model,debug)
 
 end
 
+function getResponseBeam(text,dataset,model,debug,beamsize)
+    debug = debug or false
+    local wordIds = {}
+
+    for word in tokenizer.tokenize(text) do
+        local id = dataset.word2id[word] or dataset.unknownToken
+        table.insert(wordIds, id)
+    end
+
+    local input = torch.Tensor({wordIds}):t()
+
+    --predictions is a table of tensors of word ids
+    --probabilities are the matching probs (well...log activations)
+    local beams = model:evalBeam(input,beamsize)
+    --print("Predictions")
+    --print(predictions)
+    --print(probabilities)
+    local phrase = '\n'
+    for score,beam in model:pairsByKeys(beams,function(a, b) return a > b end) do
+
+        local scoretensor = torch.Tensor(beam.problist)
+        local meanscore = torch.mean(scoretensor)
+        local sent = pred2sent(beam.currentOutput,dataset)
+        local sscore = string.format("%.4f",score)
+        local sscore2 = string.format("%.4f",meanscore)
+        phrase = phrase..sscore..', '..sscore2..': ' ..sent.. '\n'
+    end
+
+
+
+
+    if debug then
+        --printProbabilityTable(output, predictions,probabilities, 4,dataset)
+    end
+    phrase = phrase or ''
+    return phrase
+
+end
+
 
 

@@ -283,6 +283,7 @@ function Seq2Seq:eval(input)
         --wondering if we really need to forward connect before each run because we are
         --kind of starting over each run here
         self:forwardConnect(self.encoder,self.decoder,input:size(1))
+        --#output selects the last prediction of the chain
         local prediction = self.decoder:forward(torch.Tensor({output}):t())[#output]
         --print(prediction)
         -- prediction contains the probabilities for each word IDs.
@@ -316,4 +317,146 @@ function Seq2Seq:eval(input)
     self.encoder:training()
 
     return output,predictions, probabilities
+end
+
+
+function Seq2Seq:evalBeam(input,beamsize)
+    --run encoder
+    self.encoder:forward(input)
+    local beams = {}
+    -- Forward <go> and all of it's output recursively back to the decoder
+    local beam1 = {};
+    beam1.currentOutput={self.goToken}
+    beam1.length=1;
+    beam1.finished=false
+    beam1.prob=1;
+    beam1.problist = {}
+    table.insert(beam1.problist,1)
+    table.insert(beams,beam1)
+
+    local n=1
+
+    while(n<25) do
+        local newbeams = {}
+        --print(beams)
+        for _, beam in pairs(beams) do
+            io.write('.')
+
+            if(beam.finished==false) then
+                local nb=self:runOneBeam(beam,beamsize,input:size(1))
+
+                for _,nbi in pairs(nb) do
+                    newbeams[nbi.prob]=nbi;
+                end
+            else
+                newbeams[beam.prob]=beam;
+            end
+
+
+
+        end
+        --print("Full Beams")
+        --print(newbeams)
+       beams= self:shrinkBeam(newbeams,beamsize)
+        --print("Shrunken Beams")
+        --print(beams)
+        --io.read()
+        n=n+1
+
+
+    end
+
+
+
+
+
+    self.decoder:forget()
+    self.encoder:forget()
+    self.encoder:zeroGradParameters()
+    self.decoder:zeroGradParameters()
+    self.decoder:training()
+    self.encoder:training()
+
+    return beams
+
+end
+
+--returns topn child beams
+--input size is just so we know where to forward connect
+function Seq2Seq:runOneBeam(beam,beamsize,inputsize)
+    --just a table of wordids
+    local output = beam.currentOutput
+    self:forwardConnect(self.encoder,self.decoder,inputsize)
+    local prediction = self.decoder:forward(torch.Tensor({output}):t())[#output]
+    local probs, wordIds = prediction:topk(beamsize, 2, true, true)
+    local beams = {}
+
+    for i =1, beamsize do
+        local newbeam = {};
+        newbeam.length = beam.length+1
+        newbeam.finished=false
+        local newoutputs = {}
+        local next_output = wordIds[1][i]
+        local next_output_prob = torch.exp(probs[1][i])
+        newbeam.prob = beam.prob*next_output_prob
+        --store a list of all of the probabilities
+        newbeam.problist = {}
+        for k,v in ipairs(beam.problist) do
+            table.insert(newbeam.problist, v)
+        end
+        table.insert(newbeam.problist, next_output_prob)
+
+
+
+        for k,v in ipairs(output) do
+            table.insert(newoutputs, v)
+        end
+
+        table.insert(newoutputs, next_output)
+        newbeam.currentOutput=newoutputs;
+
+        --make the score zero if there is an unknown
+        if next_output==self.unknownToken  then newbeam.prob=0 end
+        if next_output==self.eosToken  then newbeam.finished=true end
+
+        table.insert(beams,newbeam);
+
+
+    end
+
+    return beams;
+
+
+end
+
+function Seq2Seq:shrinkBeam(beams,beamsize)
+
+    local i = 1
+    local shrunkenBeam = {}
+
+
+    for score,beam in self:pairsByKeys(beams,function(a, b) return a > b end) do
+        shrunkenBeam[score]=beam;
+
+        if(i==beamsize)then return shrunkenBeam end
+        i=i+1
+    end
+    return shrunkenBeam
+
+end
+
+
+function Seq2Seq:pairsByKeys (t,f)
+
+    local a = {}
+    for n in pairs(t) do table.insert(a, n) end
+    table.sort(a, f)
+    local i = 0      -- iterator variable
+    local iter = function ()   -- iterator function
+    i = i + 1
+    if a[i] == nil then return nil
+    else return a[i], t[a[i]]
+    end
+    end
+    return iter
 end
