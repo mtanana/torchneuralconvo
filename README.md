@@ -28,11 +28,11 @@ These outputs are the top five beams (using th beam.lua)
 
 **Ask: hi**
 
-Hi.
-How are you?
-What are you doing here?
-What are you doing?
-How are you doing?
+*  Hi.
+*  How are you?
+*  What are you doing here?
+*  What are you doing?
+*  How are you doing?
 
 
 **Ask: where are you from ?**
