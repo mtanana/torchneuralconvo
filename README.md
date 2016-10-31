@@ -1,8 +1,9 @@
-# torchneuralconvo
+## Torch Neural Conversation Model
 
 This is an implementation of seq2seq for language models implemented in torch.
 
 The main features are:
+
 1.  Multilayer LSTM's
 2.  Batch Processing
 3.  Explicit Vocabulary Size
@@ -10,6 +11,7 @@ The main features are:
 5.  Train/Test split
 6.  Gradient clipping
 7.  Large dataset support (above the normal LUA JIT limits, but limited by your system RAM)
+8.  Beam Search for Decoding
 
 
 
@@ -17,13 +19,62 @@ This is really an extension of awesome work from the Element Research People:  (
 
 This is technically in beta form, but I have confirmed that it is working.
 
-The nice features added from the above projects are the ability to do 1) Ada-grad 2) gradient clipping 3)  multilayer LSTM's 4) load larger datasets 5) Set explicit vocab size 6)  You can run separate train/test splits
+##Examples
 
-Might add beam search soon...
+I did a quick training with the first 9 million examples of the opensubs dataset for three epochs 
+(with minibatch of size 1, adagrad learning rate .01, 25 words in, 25 words out)
+
+These outputs are the top five beams (using th beam.lua)
+
+**Ask: hi**
+
+*  Hi.
+*  How are you?
+*  What are you doing here?
+*  What are you doing?
+*  How are you doing?
+
+
+**Ask: where are you from ?**
+
+*  I dont know.
+*  Im from ohio.
+*  From the north.
+*  I dont know...
+*  I dont know...... but i dont know.
+
+**Ask: how old are you?**
+*  \<number\>.
+*  Im \<number\>.
+*  I dont know.
+*  \<number\>?
+*  \<number\>, \<number\>.
+
+**Ask: goodbye**
+
+*  Goodbye
+*  Goodbye.
+*  What are you doing?
+*  Goodbye...
+*  What are you doing here?
+
+
+
+
+
+
+
+##Installation
+
+## Tests
 
 To run, use th trainoptim.lua --cuda  
 
 (well-  you don't have to use cuda, but this would be crazy...)
+
+When you want to test the model, run th beam.lua --cuda (or without the cuda flag if you trained it some other way)
+
+##Dataset
 
 I put a small sample from the opensubs dataset up.  Really, you can add any dataset in the form:  
 
