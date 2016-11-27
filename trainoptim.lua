@@ -208,7 +208,10 @@ for epoch = 1, options.maxEpoch do
         i = i + 1
         --test set
         if i % testEvery==0 then
-            local meanerr=runValidationSet()
+            if loader.nval>0 then
+				local meanerr=runValidationSet()
+			end
+			
             if(options.track==1) then
                 pcall(ModelTracker.sendStatistic({["category"]="Next",["name"]="Loss",["group"]="test",["n"]=totalcount,["crossid"]=crossid,["value"]=meanerr}))
             end

@@ -107,10 +107,20 @@ function WordSplitLMMinibatchLoader.create(data_dir, batch_size,seq_length, spli
 
     -- divide data to train/val and allocate rest to test
     self.ntrain = math.floor(self.train:size(1)/batch_size )-1
-    self.nval = math.floor(self.val:size(1)/batch_size)-1
-    self.ntest = math.floor(self.test:size(1)/batch_size)-1
+	
+	if self.val ~=nil then
+		self.nval = math.floor(self.val:size(1)/batch_size)-1		
+	else
+		self.nval=0
+	end	
+	if self.test ~=nil then		
+		self.ntest = math.floor(self.test:size(1)/batch_size)-1
+	else
+		self.ntest=0
+	end	
+	
     self.batch_size = batch_size
-    print ('Val Size: ' .. self.val:size(1))
+    print ('Val Size: ' .. self.nval)
 
     self.split_sizes = {self.ntrain, self.nval, self.ntest}
     self.batch_ix = {0,0,0 }
@@ -526,9 +536,13 @@ function WordSplitLMMinibatchLoader:text_to_tensor(in_textfile, out_vocabfile, o
 
     local data = {}
     data.train = examples:narrow(1,1,ntrain)
-    data.val = examples:narrow(1,ntrain+1,nval)
-    data.test = examples:narrow(1,ntrain+nval+1,ntest)
-
+	
+	if nval>0 then 
+		data.val = examples:narrow(1,ntrain+1,nval)		
+	end
+	if ntest>0 then
+		data.test = examples:narrow(1,ntrain+nval+1,ntest)
+	end
 
     -- save output preprocessed files
     print('saving ' .. out_vocabfile)
